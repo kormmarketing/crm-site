@@ -85,3 +85,38 @@ body {
     transition: none;
   }
 }
+
+/* Mobile-only: tap feedback */
+@media (max-width: 767px) {
+  .mobile-tap-card:active {
+    transform: scale(0.98);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 8px 24px -8px rgba(59, 130, 246, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.3);
+    transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+  }
+  .mobile-tap-button:active {
+    transform: scale(0.98);
+    box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.4);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .mobile-tap-link:active {
+    opacity: 0.85;
+    transform: scale(0.99);
+    transition: transform 0.1s, opacity 0.1s;
+  }
+  .mobile-telegram-glow {
+    animation: mobile-telegram-glow 3.5s ease-in-out infinite;
+  }
+}
+@keyframes mobile-telegram-glow {
+  0%, 100% { box-shadow: 0 0 30px -8px rgba(59, 130, 246, 0.35); }
+  50% { box-shadow: 0 0 45px -5px rgba(59, 130, 246, 0.5); }
+}
+
+.mobile-bg-drift {
+  animation: mobile-bg-drift 30s linear infinite;
+}
+@keyframes mobile-bg-drift {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}

@@ -20,7 +20,7 @@ export function Button({
   onClick,
 }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent/50";
+    "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent/50 mobile-tap-button";
 
   const sizeStyles = {
     sm: "px-4 py-2 text-sm",

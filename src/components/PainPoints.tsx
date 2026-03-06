@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { SectionTitle } from "./ui/SectionTitle";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const pains = [
   {
@@ -60,13 +61,13 @@ const pains = [
   },
 ];
 
-const container = {
+const container = (stagger: number) => ({
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0 },
+    transition: { staggerChildren: stagger, delayChildren: 0 },
   },
-};
+});
 
 const item = {
   hidden: { opacity: 0, y: 24 },
@@ -77,7 +78,19 @@ const item = {
   },
 };
 
+const itemMobile = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
 export function PainPoints() {
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const cardVariants = isMobile ? itemMobile : item;
+  const containerVariants = container(isMobile ? 0.08 : 0.1);
   return (
     <section id="pain-points" className="relative py-24 lg:py-32 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent opacity-30" />
@@ -88,7 +101,7 @@ export function PainPoints() {
           subtitle="Не абстрактный маркетинг — конкретные рабочие ситуации, с которыми сталкиваются отделы продаж."
         />
         <motion.div
-          variants={container}
+          variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
@@ -97,13 +110,13 @@ export function PainPoints() {
           {pains.map((pain, i) => (
             <motion.div
               key={i}
-              variants={item}
+              variants={cardVariants}
               whileHover={{
                 y: -4,
                 transition: { duration: 0.2 },
                 boxShadow: "0 16px 40px -12px rgba(59, 130, 246, 0.18), 0 0 0 1px rgba(59, 130, 246, 0.25)",
               }}
-              className="group glass-card rounded-2xl p-6 border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300"
+              className="group glass-card rounded-2xl p-6 max-md:p-7 max-md:border-white/[0.08] border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 mobile-tap-card"
             >
               <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-4 group-hover:bg-accent/20 transition-colors">
                 {pain.icon}

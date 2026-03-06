@@ -83,10 +83,10 @@ export function CaseModal({ isOpen, onClose, data }: CaseModalProps) {
               </p>
             </div>
 
-            {/* 2 columns on desktop */}
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            {/* Mobile: vertical dashboard. Desktop: 2 columns */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 max-md:space-y-8">
               {/* Left column: description, list, итог */}
-              <div className="lg:col-span-3 space-y-6">
+              <div className="lg:col-span-3 space-y-6 max-md:space-y-6">
                 {/* What we did */}
                 <div>
                   <h3 className="text-xs font-semibold text-accent uppercase tracking-wider mb-3">
@@ -129,13 +129,13 @@ export function CaseModal({ isOpen, onClose, data }: CaseModalProps) {
               </div>
 
               {/* Right column: stat cards + progress bars */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Stat cards */}
+              <div className="lg:col-span-2 space-y-6 max-md:space-y-8">
+                {/* Stat cards - 2x2 on mobile */}
                 <div>
                   <h3 className="text-xs font-semibold text-accent uppercase tracking-wider mb-3">
                     Метрики
                   </h3>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2 max-md:gap-3">
                     {data.statCards.map((stat, i) => (
                       <motion.div
                         key={i}
@@ -146,7 +146,7 @@ export function CaseModal({ isOpen, onClose, data }: CaseModalProps) {
                           delay: 0.15 + i * 0.06,
                           ease: [0.22, 1, 0.36, 1],
                         }}
-                        className="rounded-xl bg-white/[0.03] border border-white/5 p-4"
+                        className="rounded-xl bg-white/[0.03] border border-white/5 p-4 max-md:p-4 max-md:w-full"
                       >
                         <div className="font-display font-semibold text-lg text-text">
                           {stat.value}
@@ -159,12 +159,12 @@ export function CaseModal({ isOpen, onClose, data }: CaseModalProps) {
                   </div>
                 </div>
 
-                {/* Progress bars */}
-                <div>
+                {/* Progress bars - full width on mobile */}
+                <div className="max-md:w-full">
                   <h3 className="text-xs font-semibold text-accent uppercase tracking-wider mb-3">
                     Прогресс
                   </h3>
-                  <div className="space-y-4">
+                  <div className="space-y-4 max-md:space-y-5">
                     {data.progressBars.map((bar, i) => (
                       <div key={i}>
                         <div className="flex justify-between text-xs mb-1.5">

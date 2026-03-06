@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const steps = [
   {
@@ -33,15 +34,16 @@ const steps = [
 ];
 
 export function SectionDivider() {
+  const isMobile = useMediaQuery("(max-width: 767px)");
   return (
     <section className="relative py-12 lg:py-16 overflow-hidden">
       <div className="absolute inset-0 grid-pattern opacity-20" />
       <div className="container mx-auto px-6 lg:px-12 relative">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: isMobile ? 28 : 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: isMobile ? 0.65 : 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col lg:flex-row items-stretch gap-4 lg:gap-2"
         >
           {steps.map((step, i) => (
@@ -51,12 +53,12 @@ export function SectionDivider() {
             >
               {/* Card */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: isMobile ? 28 : 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{
-                  duration: 0.5,
-                  delay: i * 0.1,
+                  duration: isMobile ? 0.65 : 0.5,
+                  delay: i * (isMobile ? 0.08 : 0.1),
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 whileHover={{
@@ -65,7 +67,7 @@ export function SectionDivider() {
                   boxShadow:
                     "0 16px 40px -12px rgba(59, 130, 246, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.35)",
                 }}
-                className="group relative glass-card rounded-2xl p-6 flex-1 min-w-0 border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 z-10"
+                className="group relative glass-card rounded-2xl p-6 flex-1 min-w-0 max-md:border-white/[0.08] border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 z-10 mobile-tap-card"
               >
                 <h3 className="font-display font-semibold text-lg text-text mb-4 group-hover:text-accent-light/90 transition-colors">
                   {step.title}

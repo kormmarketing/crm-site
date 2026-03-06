@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { Button } from "./ui/Button";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export function FinalCTA() {
+  const isMobile = useMediaQuery("(max-width: 767px)");
   return (
     <section id="contact" className="relative py-24 lg:py-32 overflow-hidden">
       {/* Large glow gradient background */}
@@ -20,11 +22,11 @@ export function FinalCTA() {
       <div className="absolute inset-0 grid-pattern opacity-30" />
       <div className="container mx-auto px-6 lg:px-12 relative">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: isMobile ? 28 : 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative rounded-3xl p-12 lg:p-20 text-center overflow-hidden border border-white/10 backdrop-blur-2xl bg-white/[0.03] shadow-[0_0_80px_-20px_rgba(59,130,246,0.2)]"
+          transition={{ duration: isMobile ? 0.65 : 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="relative rounded-3xl p-12 lg:p-20 text-center overflow-hidden border border-white/10 backdrop-blur-2xl bg-white/[0.03] shadow-[0_0_80px_-20px_rgba(59,130,246,0.2)] max-md:border-white/[0.08]"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-cyan/5" />
           <div className="relative">

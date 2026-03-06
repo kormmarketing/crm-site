@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface SectionTitleProps {
   label?: string;
@@ -16,13 +17,14 @@ export function SectionTitle({
   align = "left",
 }: SectionTitleProps) {
   const alignStyles = align === "center" ? "text-center mx-auto" : "";
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: isMobile ? 28 : 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: isMobile ? 0.65 : 0.5 }}
       className={`max-w-3xl ${alignStyles}`}
     >
       {label && (

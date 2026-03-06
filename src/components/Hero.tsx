@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "./ui/Button";
 
 const containerVariants = {
@@ -23,17 +24,43 @@ const itemVariants = {
   },
 };
 
+const labels = ["Bitrix24", "Telegram", "CRM", "Аналитика"];
+const floatDelays = [0, 0.3, 0.6, 0.2];
+const floatDurations = [7, 6.5, 8, 6];
+
 export function Hero() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  const { scrollY } = useScroll();
+  const parallaxY = useTransform(scrollY, [0, 400], [0, 12]);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background effects */}
+      {/* Background effects - desktop unchanged */}
       <div className="absolute inset-0 bg-gradient-mesh" />
       <div className="absolute inset-0 grid-pattern opacity-50" />
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-[glow-pulse_8s_ease-in-out_infinite]" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-cyan/5 rounded-full blur-3xl animate-[glow-pulse_10s_ease-in-out_infinite]" />
 
-      <div className="relative container mx-auto px-6 lg:px-12 py-24 lg:py-32">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+      {/* Mobile-only: subtle background motion */}
+      <div
+        className="absolute inset-0 md:hidden opacity-50 mobile-bg-drift"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(59,130,246,0.05) 0%, transparent 40%, transparent 60%, rgba(34,211,238,0.04) 100%)",
+          backgroundSize: "200% 200%",
+        }}
+      />
+
+      <div className="relative container mx-auto px-6 lg:px-12 py-16 md:py-24 lg:py-32">
+        <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
           {/* Left: Content */}
           <motion.div
             variants={containerVariants}
@@ -57,7 +84,7 @@ export function Hero() {
             </motion.h1>
             <motion.p
               variants={itemVariants}
-              className="text-lg sm:text-xl text-text-muted leading-relaxed mb-10 max-w-xl"
+              className="text-lg sm:text-xl text-text-muted leading-relaxed mb-8 md:mb-10 max-w-xl"
             >
               Bitrix24, телефония, аналитика лидов, Telegram-боты. Без воды —
               под конкретные процессы вашего бизнеса.
@@ -70,7 +97,7 @@ export function Hero() {
                 href="https://t.me/"
                 variant="primary"
                 size="lg"
-                className="group"
+                className="group mobile-telegram-glow"
               >
                 <span className="flex items-center gap-2">
                   Обсудить задачу в Telegram
@@ -95,25 +122,38 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Right: Animated mockup - full on desktop, simplified on mobile */}
+          {/* Right: Animated mockup - full on desktop, compact cluster on mobile */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
-            className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center"
+            className="relative h-[280px] md:h-[500px] lg:h-[600px] flex items-center justify-center"
           >
-            <div className="md:hidden flex gap-3 flex-wrap justify-center p-4">
-              {["Bitrix24", "Telegram", "CRM", "Аналитика"].map((label, i) => (
-                <motion.div
-                  key={label}
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
-                  className="glass-card rounded-xl px-4 py-3 text-sm text-text-muted"
-                >
-                  {label}
-                </motion.div>
-              ))}
-            </div>
+            {/* Mobile: compact floating cluster */}
+            <motion.div
+              style={isMobile ? { y: parallaxY } : undefined}
+              className="md:hidden relative w-full max-w-[280px] mx-auto"
+            >
+              <div className="grid grid-cols-2 gap-2 place-items-center">
+                {labels.map((label, i) => (
+                  <motion.div
+                    key={label}
+                    className="glass-card rounded-lg px-3 py-2 text-xs text-text-muted border-white/[0.06] w-full max-w-[120px] mobile-tap-card"
+                    animate={{ y: [-6, 6, -6] }}
+                    transition={{
+                      duration: floatDurations[i],
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: floatDelays[i],
+                    }}
+                  >
+                    {label}
+                  </motion.div>
+                ))}
+              </div>
+              <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-accent/60 animate-pulse" />
+              <div className="absolute -bottom-2 -left-2 w-1.5 h-1.5 rounded-full bg-accent-cyan/60 animate-pulse" style={{ animationDelay: "0.5s" }} />
+            </motion.div>
             <div className="hidden md:block w-full h-full">
               <HeroMockup />
             </div>

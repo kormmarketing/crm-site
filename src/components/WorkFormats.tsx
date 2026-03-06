@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { SectionTitle } from "./ui/SectionTitle";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const formats = [
   {
@@ -22,13 +23,13 @@ const formats = [
   },
 ];
 
-const container = {
+const container = (stagger: number) => ({
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0 },
+    transition: { staggerChildren: stagger, delayChildren: 0 },
   },
-};
+});
 
 const cardVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -39,7 +40,19 @@ const cardVariants = {
   },
 };
 
+const cardVariantsMobile = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
 export function WorkFormats() {
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const containerVariants = container(isMobile ? 0.08 : 0.1);
+  const variants = isMobile ? cardVariantsMobile : cardVariants;
   return (
     <section id="formats" className="relative py-24 lg:py-32 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent-purple/5 to-transparent opacity-50" />
@@ -51,7 +64,7 @@ export function WorkFormats() {
           align="center"
         />
         <motion.div
-          variants={container}
+          variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
@@ -60,13 +73,13 @@ export function WorkFormats() {
           {formats.map((format, i) => (
             <motion.div
               key={i}
-              variants={cardVariants}
+              variants={variants}
               whileHover={{
                 y: -4,
                 transition: { duration: 0.2 },
                 boxShadow: "0 16px 40px -12px rgba(59, 130, 246, 0.18), 0 0 0 1px rgba(59, 130, 246, 0.35)",
               }}
-              className="glass-card rounded-2xl p-6 text-center border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300"
+              className="glass-card rounded-2xl p-6 text-center max-md:p-7 max-md:border-white/[0.08] border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 mobile-tap-card"
             >
               <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4 text-accent font-display font-bold text-xl">
                 {i + 1}

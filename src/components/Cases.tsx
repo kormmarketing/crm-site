@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionTitle } from "./ui/SectionTitle";
 import { CaseModal, CaseModalData } from "./ui/CaseModal";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 type CaseData = {
   tags: string[];
@@ -220,13 +221,13 @@ const cases: CaseData[] = [
   },
 ];
 
-const container = {
+const container = (stagger: number) => ({
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0 },
+    transition: { staggerChildren: stagger, delayChildren: 0 },
   },
-};
+});
 
 const cardVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -237,8 +238,20 @@ const cardVariants = {
   },
 };
 
+const cardVariantsMobile = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
 export function Cases() {
   const [selectedCase, setSelectedCase] = useState<CaseData | null>(null);
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const containerVariants = container(isMobile ? 0.08 : 0.1);
+  const variants = isMobile ? cardVariantsMobile : cardVariants;
 
   return (
     <section id="cases" className="relative py-24 lg:py-32 overflow-hidden">
@@ -250,7 +263,7 @@ export function Cases() {
           subtitle="Типовые проекты, которые закрываю. Реальные кейсы — по запросу."
         />
         <motion.div
-          variants={container}
+          variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
@@ -259,7 +272,7 @@ export function Cases() {
           {cases.map((c, i) => (
             <motion.div
               key={i}
-              variants={cardVariants}
+              variants={variants}
               whileHover={{
                 y: -4,
                 scale: 1.02,
@@ -268,9 +281,9 @@ export function Cases() {
                   "0 16px 40px -12px rgba(59, 130, 246, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.35)",
               }}
               onClick={() => setSelectedCase(c)}
-              className="group glass-card rounded-2xl p-6 overflow-hidden border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 cursor-pointer"
+              className="group glass-card rounded-2xl p-6 overflow-hidden max-md:p-7 max-md:border-white/[0.08] border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 cursor-pointer mobile-tap-card"
             >
-              <div className="mb-3">
+              <div className="mb-3 max-md:mb-4">
                 {c.tags.map((tag, j) => (
                   <span
                     key={j}
@@ -280,16 +293,16 @@ export function Cases() {
                   </span>
                 ))}
               </div>
-              <h3 className="font-display font-semibold text-lg text-text mb-2 group-hover:text-accent-light/90 transition-colors">
+              <h3 className="font-display font-semibold text-lg text-text mb-2 max-md:mb-3 group-hover:text-accent-light/90 transition-colors">
                 {c.title}
               </h3>
-              <p className="text-text-muted text-sm leading-relaxed mb-4">
+              <p className="text-text-muted text-sm leading-relaxed mb-4 max-md:mb-5">
                 {c.desc}
               </p>
 
               {/* Metrics block - hidden on desktop, reveal on hover; always visible on touch */}
               <div
-                className="space-y-1.5 pt-2 border-t border-white/5 opacity-100 translate-y-0 lg:opacity-0 lg:translate-y-2 lg:group-hover:opacity-100 lg:group-hover:translate-y-0 transition-all duration-[0.35s] ease-out"
+                className="space-y-1.5 pt-2 border-t border-white/5 max-md:pt-4 max-md:space-y-2 opacity-100 translate-y-0 lg:opacity-0 lg:translate-y-2 lg:group-hover:opacity-100 lg:group-hover:translate-y-0 transition-all duration-[0.35s] ease-out"
               >
                 {c.metrics.map((m, j) => (
                   <div

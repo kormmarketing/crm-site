@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { SectionTitle } from "./ui/SectionTitle";
 import { Button } from "./ui/Button";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const services = [
   {
@@ -73,13 +74,13 @@ const services = [
   },
 ];
 
-const container = {
+const container = (stagger: number) => ({
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0 },
+    transition: { staggerChildren: stagger, delayChildren: 0 },
   },
-};
+});
 
 const cardVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -90,7 +91,19 @@ const cardVariants = {
   },
 };
 
+const cardVariantsMobile = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
 export function Services() {
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const containerVariants = container(isMobile ? 0.08 : 0.1);
+  const variants = isMobile ? cardVariantsMobile : cardVariants;
   return (
     <section id="services" className="relative py-14 lg:py-20 overflow-hidden">
       <div className="absolute inset-0 grid-pattern opacity-25" />
@@ -101,7 +114,7 @@ export function Services() {
           subtitle="Внедрение и настройка систем под реальные процессы вашего бизнеса."
         />
         <motion.div
-          variants={container}
+          variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
@@ -110,13 +123,13 @@ export function Services() {
           {services.map((service, i) => (
             <motion.div
               key={i}
-              variants={cardVariants}
+              variants={variants}
               whileHover={{
                 y: -4,
                 transition: { duration: 0.25 },
                 boxShadow: "0 16px 40px -12px rgba(59, 130, 246, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.35)",
               }}
-              className="group relative glass-card rounded-2xl p-7 lg:p-8 overflow-hidden border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300"
+              className="group relative glass-card rounded-2xl p-7 lg:p-8 overflow-hidden max-md:border-white/[0.08] border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 mobile-tap-card"
             >
               <div
                 className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}

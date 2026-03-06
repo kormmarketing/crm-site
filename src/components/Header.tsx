@@ -81,27 +81,41 @@ export function Header() {
 
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="md:hidden fixed inset-0 top-[72px] bg-background/95 backdrop-blur-xl z-40"
-          >
-            <nav className="flex flex-col p-6 gap-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target={link.external ? "_blank" : undefined}
-                  rel={link.external ? "noopener noreferrer" : undefined}
-                  onClick={() => setMenuOpen(false)}
-                  className="text-lg text-text-muted hover:text-text py-2 transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-          </motion.div>
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden fixed inset-0 top-0 bg-black/50 backdrop-blur-sm z-40"
+              onClick={() => setMenuOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="md:hidden fixed inset-x-0 top-[72px] bg-background/98 backdrop-blur-xl z-40 border-b border-white/5"
+            >
+              <nav className="flex flex-col p-6 gap-1">
+                {navLinks.map((link, i) => (
+                  <motion.a
+                    key={link.href}
+                    href={link.href}
+                    target={link.external ? "_blank" : undefined}
+                    rel={link.external ? "noopener noreferrer" : undefined}
+                    onClick={() => setMenuOpen(false)}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 + i * 0.05, duration: 0.25 }}
+                    className="text-lg text-text-muted hover:text-text py-3 px-2 transition-colors rounded-lg hover:bg-white/5 mobile-tap-link"
+                  >
+                    {link.label}
+                  </motion.a>
+                ))}
+              </nav>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </motion.header>
