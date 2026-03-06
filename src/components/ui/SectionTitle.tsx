@@ -24,7 +24,7 @@ export function SectionTitle({
       initial={{ opacity: 0, y: isMobile ? 28 : 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: isMobile ? 0.65 : 0.5 }}
+      transition={{ duration: isMobile ? 0.6 : 0.5 }}
       className={`max-w-3xl ${alignStyles}`}
     >
       {label && (

@@ -59,7 +59,7 @@ export function Hero() {
         }}
       />
 
-      <div className="relative container mx-auto px-6 lg:px-12 py-16 md:py-24 lg:py-32">
+      <div className="relative container mx-auto px-6 lg:px-12 py-12 md:py-24 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center">
           {/* Left: Content */}
           <motion.div
@@ -129,16 +129,16 @@ export function Hero() {
             transition={{ duration: 1, delay: 0.5 }}
             className="relative h-[280px] md:h-[500px] lg:h-[600px] flex items-center justify-center"
           >
-            {/* Mobile: compact floating cluster */}
+            {/* Mobile: compact floating cluster - smaller badges, tighter */}
             <motion.div
               style={isMobile ? { y: parallaxY } : undefined}
-              className="md:hidden relative w-full max-w-[280px] mx-auto"
+              className="md:hidden relative w-full max-w-[200px] mx-auto"
             >
-              <div className="grid grid-cols-2 gap-2 place-items-center">
+              <div className="grid grid-cols-2 gap-1.5 place-items-center">
                 {labels.map((label, i) => (
                   <motion.div
                     key={label}
-                    className="glass-card rounded-lg px-3 py-2 text-xs text-text-muted border-white/[0.06] w-full max-w-[120px] mobile-tap-card"
+                    className="glass-card rounded-lg px-2.5 py-1.5 text-[11px] text-text-muted border-white/[0.06] w-full max-w-[90px] mobile-tap-card"
                     animate={{ y: [-6, 6, -6] }}
                     transition={{
                       duration: floatDurations[i],

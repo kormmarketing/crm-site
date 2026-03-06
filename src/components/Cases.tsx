@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, useInView, animate } from "framer-motion";
 import { SectionTitle } from "./ui/SectionTitle";
 import { CaseModal, CaseModalData } from "./ui/CaseModal";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -238,20 +238,71 @@ const cardVariants = {
   },
 };
 
-const cardVariantsMobile = {
-  hidden: { opacity: 0, y: 28 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
-  },
-};
+/** Parse metric string: extract first number and whether it's a % for progress bar */
+function parseMetric(metric: string): { value?: number; isPercent: boolean; rest: string } {
+  const percentMatch = metric.match(/^(\d+)\s*%/);
+  if (percentMatch) {
+    return { value: Math.min(100, parseInt(percentMatch[1], 10)), isPercent: true, rest: metric.replace(/^\d+\s*%\s*/, "") };
+  }
+  const numMatch = metric.match(/^(\d+)\s*(.*)$/);
+  if (numMatch) return { value: parseInt(numMatch[1], 10), isPercent: false, rest: (numMatch[2] || "").trim() };
+  return { isPercent: false, rest: metric };
+}
+
+function AnimatedMetric({ metric, delay }: { metric: string; delay: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const { value, isPercent, rest } = parseMetric(metric);
+  const [displayNum, setDisplayNum] = useState(0);
+
+  useEffect(() => {
+    if (!isInView || value == null) return;
+    const controls = animate(0, value, {
+      duration: 1.1,
+      delay,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => setDisplayNum(Math.round(v)),
+    });
+    return () => controls.stop();
+  }, [isInView, value, delay]);
+
+  return (
+    <div ref={ref} className="space-y-1.5">
+      <div className="text-xs text-text-muted/90 flex items-center gap-2">
+        {value != null ? (
+          <>
+            <span className="tabular-nums text-accent font-semibold">
+              {displayNum}
+              {isPercent ? "%" : ""}
+            </span>
+            {rest && <span>{rest}</span>}
+          </>
+        ) : (
+          <>
+            <span className="w-1.5 h-1.5 rounded-full bg-accent/60 shrink-0" />
+            <span>{metric}</span>
+          </>
+        )}
+      </div>
+      {isPercent && value != null && (
+        <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={isInView ? { width: `${value}%` } : { width: 0 }}
+            transition={{ duration: 1.1, delay, ease: [0.22, 1, 0.36, 1] }}
+            className="h-full rounded-full bg-gradient-to-r from-accent/80 to-accent"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Cases() {
   const [selectedCase, setSelectedCase] = useState<CaseData | null>(null);
   const isMobile = useMediaQuery("(max-width: 767px)");
   const containerVariants = container(isMobile ? 0.08 : 0.1);
-  const variants = isMobile ? cardVariantsMobile : cardVariants;
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
     <section id="cases" className="relative py-24 lg:py-32 overflow-hidden">
@@ -262,17 +313,19 @@ export function Cases() {
           title="Примеры задач и сценариев"
           subtitle="Типовые проекты, которые закрываю. Реальные кейсы — по запросу."
         />
+
+        {/* Desktop: keep grid */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
-          className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="mt-16 hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {cases.map((c, i) => (
             <motion.div
               key={i}
-              variants={variants}
+              variants={cardVariants}
               whileHover={{
                 y: -4,
                 scale: 1.02,
@@ -281,9 +334,9 @@ export function Cases() {
                   "0 16px 40px -12px rgba(59, 130, 246, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.35)",
               }}
               onClick={() => setSelectedCase(c)}
-              className="group glass-card rounded-2xl p-6 overflow-hidden max-md:p-7 max-md:border-white/[0.08] border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 cursor-pointer mobile-tap-card"
+              className="group glass-card rounded-2xl p-6 overflow-hidden border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 cursor-pointer mobile-tap-card"
             >
-              <div className="mb-3 max-md:mb-4">
+              <div className="mb-3">
                 {c.tags.map((tag, j) => (
                   <span
                     key={j}
@@ -293,22 +346,15 @@ export function Cases() {
                   </span>
                 ))}
               </div>
-              <h3 className="font-display font-semibold text-lg text-text mb-2 max-md:mb-3 group-hover:text-accent-light/90 transition-colors">
+              <h3 className="font-display font-semibold text-lg text-text mb-2 group-hover:text-accent-light/90 transition-colors">
                 {c.title}
               </h3>
-              <p className="text-text-muted text-sm leading-relaxed mb-4 max-md:mb-5">
+              <p className="text-text-muted text-sm leading-relaxed mb-4">
                 {c.desc}
               </p>
-
-              {/* Metrics block - hidden on desktop, reveal on hover; always visible on touch */}
-              <div
-                className="space-y-1.5 pt-2 border-t border-white/5 max-md:pt-4 max-md:space-y-2 opacity-100 translate-y-0 lg:opacity-0 lg:translate-y-2 lg:group-hover:opacity-100 lg:group-hover:translate-y-0 transition-all duration-[0.35s] ease-out"
-              >
+              <div className="space-y-1.5 pt-2 border-t border-white/5 lg:opacity-0 lg:translate-y-2 lg:group-hover:opacity-100 lg:group-hover:translate-y-0 transition-all duration-[0.35s] ease-out">
                 {c.metrics.map((m, j) => (
-                  <div
-                    key={j}
-                    className="text-xs text-text-muted/90 flex items-center gap-2"
-                  >
+                  <div key={j} className="text-xs text-text-muted/90 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent/60 shrink-0" />
                     {m}
                   </div>
@@ -317,6 +363,51 @@ export function Cases() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Mobile: horizontal swipe case cards */}
+        <div className="md:hidden mt-12">
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 -mx-6 px-6 scrollbar-hide"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
+            {cases.map((c, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.04 }}
+                onClick={() => setSelectedCase(c)}
+                className="flex-shrink-0 snap-center w-[90vw] max-w-[380px] cursor-pointer mobile-tap-card"
+              >
+                <div className="glass-card rounded-2xl p-6 overflow-hidden border-white/[0.08] h-full">
+                  <div className="mb-3">
+                    {c.tags.map((tag, j) => (
+                      <span
+                        key={j}
+                        className="inline-block mr-2 mb-2 px-2.5 py-0.5 rounded-md bg-accent/10 text-accent text-xs font-medium"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h3 className="font-display font-semibold text-lg text-text mb-2">
+                    {c.title}
+                  </h3>
+                  <p className="text-text-muted text-sm leading-relaxed mb-4">
+                    {c.desc}
+                  </p>
+                  <div className="space-y-3 pt-4 border-t border-white/5">
+                    {c.metrics.map((m, j) => (
+                      <AnimatedMetric key={j} metric={m} delay={0.1 + j * 0.15} />
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {selectedCase && (

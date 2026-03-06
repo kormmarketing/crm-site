@@ -27,6 +27,15 @@ body {
   color: var(--text);
 }
 
+/* Hide scrollbar for horizontal sliders on mobile */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -92,17 +101,17 @@ body {
     transform: scale(0.98);
     border-color: rgba(59, 130, 246, 0.4);
     box-shadow: 0 8px 24px -8px rgba(59, 130, 246, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.3);
-    transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+    transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
   }
   .mobile-tap-button:active {
     transform: scale(0.98);
     box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.4);
-    transition: transform 0.1s, box-shadow 0.1s;
+    transition: transform 0.12s, box-shadow 0.12s;
   }
   .mobile-tap-link:active {
     opacity: 0.85;
     transform: scale(0.99);
-    transition: transform 0.1s, opacity 0.1s;
+    transition: transform 0.12s, opacity 0.12s;
   }
   .mobile-telegram-glow {
     animation: mobile-telegram-glow 3.5s ease-in-out infinite;

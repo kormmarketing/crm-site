@@ -1,10 +1,9 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { SectionTitle } from "./ui/SectionTitle";
 import { Button } from "./ui/Button";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
-
 const services = [
   {
     title: "CRM и воронка продаж",
@@ -91,19 +90,27 @@ const cardVariants = {
   },
 };
 
-const cardVariantsMobile = {
-  hidden: { opacity: 0, y: 28 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
-  },
-};
-
 export function Services() {
-  const isMobile = useMediaQuery("(max-width: 767px)");
-  const containerVariants = container(isMobile ? 0.08 : 0.1);
-  const variants = isMobile ? cardVariantsMobile : cardVariants;
+  const [activeSlide, setActiveSlide] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const containerVariants = container(0.1);
+
+  const gap = 16;
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth } = scrollRef.current;
+    const slideStep = (scrollWidth - scrollRef.current.clientWidth + gap * (services.length - 1)) / services.length || 0;
+    const index = slideStep > 0 ? Math.round(scrollLeft / slideStep) : 0;
+    setActiveSlide(Math.min(Math.max(0, index), services.length - 1));
+  };
+
+  const scrollToSlide = (i: number) => {
+    if (!scrollRef.current) return;
+    const slide = scrollRef.current.children[i] as HTMLElement | undefined;
+    slide?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+  };
+
   return (
     <section id="services" className="relative py-14 lg:py-20 overflow-hidden">
       <div className="absolute inset-0 grid-pattern opacity-25" />
@@ -113,23 +120,25 @@ export function Services() {
           title="Какие системы внедряю после диагностики"
           subtitle="Внедрение и настройка систем под реальные процессы вашего бизнеса."
         />
+
+        {/* Desktop: keep current grid */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
-          className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+          className="mt-12 hidden md:grid grid-cols-2 lg:grid-cols-3 gap-5"
         >
           {services.map((service, i) => (
             <motion.div
               key={i}
-              variants={variants}
+              variants={cardVariants}
               whileHover={{
                 y: -4,
                 transition: { duration: 0.25 },
                 boxShadow: "0 16px 40px -12px rgba(59, 130, 246, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.35)",
               }}
-              className="group relative glass-card rounded-2xl p-7 lg:p-8 overflow-hidden max-md:border-white/[0.08] border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 mobile-tap-card"
+              className="group relative glass-card rounded-2xl p-7 lg:p-8 overflow-hidden border-white/[0.06] hover:border-[rgba(59,130,246,0.35)] hover:bg-white/[0.04] transition-all duration-300 mobile-tap-card"
             >
               <div
                 className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}
@@ -158,6 +167,75 @@ export function Services() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Mobile: horizontal swipe slider */}
+        <div className="md:hidden mt-12">
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 -mx-6 px-6 scrollbar-hide"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
+            {services.map((service, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.04 }}
+                className="flex-shrink-0 snap-center mobile-tap-card"
+                style={{
+                  width: "calc(88vw - 24px)",
+                  maxWidth: 340,
+                  minWidth: 280,
+                }}
+              >
+                <div className="group relative glass-card rounded-2xl p-6 overflow-hidden border-white/[0.08] h-full">
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-[0.03]`}
+                  />
+                  <div className="relative">
+                    <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center mb-4 text-accent">
+                      {service.icon}
+                    </div>
+                    <h3 className="font-display font-semibold text-lg text-text mb-2.5">
+                      {service.title}
+                    </h3>
+                    <p className="text-text-muted text-sm leading-relaxed mb-4">
+                      {service.desc}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {service.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2.5 py-0.5 rounded-md bg-white/5 text-text-muted text-xs font-medium border border-white/5"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          {/* Indicator dots */}
+          <div className="flex justify-center gap-2 mt-4">
+            {services.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => scrollToSlide(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === activeSlide
+                    ? "w-6 bg-accent"
+                    : "w-2 bg-white/25"
+                }`}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
