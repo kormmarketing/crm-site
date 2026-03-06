@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0f;
+  --surface: #0f1117;
+  --text: #f5f5f7;
+  --text-muted: #94a3b8;
+  --accent: #3b82f6;
+  --accent-cyan: #22d3ee;
+  --accent-purple: #a78bfa;
+  --glow-blue: rgba(59, 130, 246, 0.4);
+  --parallax-offset: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 17, 23, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Gradient text utility */
+.gradient-text {
+  @apply text-transparent bg-gradient-to-r from-accent via-accent-light to-accent-cyan;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Glass card */
+.glass-card {
+  @apply backdrop-blur-xl border border-white/5 bg-white/[0.02];
+}
+
+/* Grid background pattern */
+.grid-pattern {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Glow line */
+.glow-line {
+  box-shadow: 0 0 20px -5px var(--glow-blue);
+}
+
+/* Card hover glow - premium SaaS style */
+.card-hover-glow {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+
+.card-hover-glow:hover {
+  box-shadow: 0 0 40px -10px rgba(59, 130, 246, 0.25),
+    0 0 0 1px rgba(59, 130, 246, 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-hover-glow {
+    transition: none;
+  }
+}
